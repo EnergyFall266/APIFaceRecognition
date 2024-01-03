@@ -9,7 +9,7 @@ import io
 import face_recognition
 import os
 class Img(BaseModel):
-    url: str 
+    url: str
     name: str 
 
 app = FastAPI()
@@ -17,23 +17,26 @@ known_faces = []
 @app.post("/CadastroImage")
 async def create_image(image: Img):
     lista = []
-    img = base64.b64decode(image.url)
-    imag = Image.open(io.BytesIO(img))
-    imag.convert('RGB')
-    imag.save(f"{image.name}.jpg")
-    img2 = cv2.imread(f"{image.name}.jpg")
-    rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-    img_encoding = face_recognition.face_encodings(rgb_img)[0]
-    os.remove(f"{image.name}.jpg")
-    lista.append(image.name)
-    lista.append(img_encoding)
-    known_faces.append(lista)
-    print(known_faces)
-    print(len(known_faces))
+    img = Image.open(io.BytesIO(base64.decodebytes(bytes(image.url, "utf-8"))))
+    img.save('my-image.jpeg')
+        
+    # img = base64.b64decode(image.url)
+    # imag = Image.open(io.BytesIO(img))
+    # imag.convert('RGB')
+    # imag.save(f"{image.name}.jpg")
+    # img2 = cv2.imread(f"{image.name}.jpg")
+    # rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+    # img_encoding = face_recognition.face_encodings(rgb_img)[0]
+    # os.remove(f"{image.name}.jpg")
+    # lista.append(image.name)
+    # lista.append(img_encoding)
+    # known_faces.append(lista)
+    # print(known_faces)
+    # print(len(known_faces))
   
 
 
-    return {"message": "Image received"}
+    return {"message": "Sign up successful"}
 
 @app.post("/Reconhecimento")
 async def create_image(image: Img):
