@@ -17,22 +17,20 @@ known_faces = []
 @app.post("/CadastroImage")
 async def create_image(image: Img):
     lista = []
-    img = Image.open(io.BytesIO(base64.decodebytes(bytes(image.url, "utf-8"))))
-    img.save('my-image.jpeg')
-        
-    # img = base64.b64decode(image.url)
-    # imag = Image.open(io.BytesIO(img))
-    # imag.convert('RGB')
-    # imag.save(f"{image.name}.jpg")
-    # img2 = cv2.imread(f"{image.name}.jpg")
-    # rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-    # img_encoding = face_recognition.face_encodings(rgb_img)[0]
-    # os.remove(f"{image.name}.jpg")
-    # lista.append(image.name)
-    # lista.append(img_encoding)
-    # known_faces.append(lista)
-    # print(known_faces)
-    # print(len(known_faces))
+
+    img = base64.b64decode(image.url)
+    imag = Image.open(io.BytesIO(img))
+    imag.convert('RGB')
+    imag.save(f"{image.name}.jpg")
+    img2 = cv2.imread(f"{image.name}.jpg")
+    rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+    img_encoding = face_recognition.face_encodings(rgb_img)[0]
+    os.remove(f"{image.name}.jpg")
+    lista.append(image.name)
+    lista.append(img_encoding)
+    known_faces.append(lista)
+    print(known_faces)
+    print(len(known_faces))
   
 
 
@@ -51,6 +49,7 @@ async def create_image(image: Img):
     i=0
     while(i<len(known_faces)):
         result = face_recognition.compare_faces([known_faces[i][1]], img_encoding2)
+        print(result[0])
         if(result[0]):
             return {"message": "Person found",
                     "name": known_faces[i][0],
