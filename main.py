@@ -7,18 +7,20 @@ import io
 import face_recognition
 import os
 
-class Img2(BaseModel):
+class ImgComp(BaseModel):
     url1: str
     url2: str
-class Img(BaseModel):
+class ImgCad(BaseModel):
     url: str
     name: str 
     cpf: str
+class ImgRec(BaseModel):
+    url: str
 
 app = FastAPI()
 known_faces = []
 @app.post("/CadastroImagem")
-async def CadastroImagem(image: Img):
+async def CadastroImagem(image: ImgCad):
     lista = []
 
     img = base64.b64decode(image.url)
@@ -41,19 +43,18 @@ async def CadastroImagem(image: Img):
     return {"message": "Imagem cadastrada com sucesso"}
 
 @app.post("/Reconhecimento")
-async def Reconhecimento(image: Img):
+async def Reconhecimento(image: ImgRec):
     img = base64.b64decode(image.url)
     imag = Image.open(io.BytesIO(img))
     imag.convert('RGB')
-    imag.save(f"{image.name}.jpg")
-    img2 = cv2.imread(f"{image.name}.jpg")
+    imag.save("imagem.jpg")
+    img2 = cv2.imread("imagem.jpg")
     rgb_img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
     img_encoding2 = face_recognition.face_encodings(rgb_img2)[0]
-    os.remove(f"{image.name}.jpg")
+    os.remove("imagem.jpg")
     i=0
     while(i<len(known_faces)):
         result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2)
-        print(result[0])
         if(result[0]):
             return {"message": "Pessoa encontrada",
                     "name": known_faces[i][0],
@@ -65,7 +66,7 @@ async def Reconhecimento(image: Img):
         return {"message": "Pessoa nao encontrada"}
 
 @app.post("/ComparaImagens")
-async def ComparaImagens(image: Img2):
+async def ComparaImagens(image: ImgComp):
     img = base64.b64decode(image.url1)
     imag = Image.open(io.BytesIO(img))
     imag.convert('RGB')
