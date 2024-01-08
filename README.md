@@ -16,13 +16,13 @@ conda install anaconda::pillow
 
 ## Utilização
 
-Esta Api possui 3 portas POST
+Esta Api possui 3 portas ***POST***.
  - /CadastroImagem
  - /Reconhecimento
  - /ComparaImagens
 
 ### /CadastroImagem
-Armazena a imagem junto as informações para futuramente serem utilizadas para comparação na porta **/Reconhecimento**. 
+Armazena a imagem e as informações em uma lista para futuramente serem utilizadas pela porta **/Reconhecimento**. 
 
 #### Entradas
 ```json
@@ -30,3 +30,13 @@ Armazena a imagem junto as informações para futuramente serem utilizadas para 
 "name": "<string>",
 "cpf": "<string>"
 ```
+### Saída
+Se tudo der certo a mensagem de retorno será:
+```json
+"message": "Imagem cadastrada com sucesso"
+```
+
+### /Reconhecimento
+Compara a imagem enviada com as que ja estão salvas na lista
+
+### Entrada
