@@ -38,7 +38,7 @@ async def CadastroImagem(image: Img):
   
 
 
-    return {"message": "Sign up successful"}
+    return {"message": "Imagem cadastrada com sucesso"}
 
 @app.post("/Reconhecimento")
 async def Reconhecimento(image: Img):
@@ -55,14 +55,14 @@ async def Reconhecimento(image: Img):
         result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2)
         print(result[0])
         if(result[0]):
-            return {"message": "Person found",
+            return {"message": "Pessoa encontrada",
                     "name": known_faces[i][0],
                     "cpf": known_faces[i][1],
                     "distance": face_recognition.face_distance([known_faces[i][2]], img_encoding2)[0]}
             
         i+=1
     if not result[0]:
-        return {"message": "Person not found"}
+        return {"message": "Pessoa nao encontrada"}
 
 @app.post("/ComparaImagens")
 async def ComparaImagens(image: Img2):
@@ -86,6 +86,6 @@ async def ComparaImagens(image: Img2):
 
     result = face_recognition.compare_faces([img_encoding], img_encoding2)
     if(result[0]):
-        return {"message": "Faces are the same"}
+        return {"message": "Mesma pessoa"}
     else:
-        return {"message": "Faces are not the same"}
+        return {"message": "Nao e a mesma pessoa"}
