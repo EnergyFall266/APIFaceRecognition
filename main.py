@@ -59,7 +59,8 @@ async def Reconhecimento(image: ImgRec):
             return {"message": "Pessoa encontrada",
                     "name": known_faces[i][0],
                     "cpf": known_faces[i][1],
-                    "distance": face_recognition.face_distance([known_faces[i][2]], img_encoding2)[0]}
+                    # "distance": face_recognition.face_distance([known_faces[i][2]], img_encoding2)[0]
+                    }
             
         i+=1
     if not result[0]:
