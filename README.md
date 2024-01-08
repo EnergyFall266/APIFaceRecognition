@@ -37,6 +37,18 @@ Se tudo der certo a mensagem de retorno será:
 ```
 
 ### /Reconhecimento
-Compara a imagem enviada com as que ja estão salvas na lista
+Compara a imagem enviada com as que ja estão salvas na lista.
 
 ### Entrada
+```json
+"url": "<string base64 da imagem>"
+```
+### Saída
+Se a imagem enviada der *match* com alguma da lista ele retornará:
+```json
+"message": "Pessoa encontrada",
+"name" : "<nome da pessoa>",
+"cpf": "<cpf da pessoa>",
+
+```
+
