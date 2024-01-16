@@ -87,3 +87,8 @@ Se não for:
 "message": "Nao e a mesma pessoa"
 }
 ```
+### Execução
+Para subir a API na rede local é só rodar no terminal o comando:
+```bash
+uvicorn main:app --reload
+```
