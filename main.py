@@ -6,6 +6,7 @@ from PIL import Image
 import io
 import face_recognition
 import os
+from typing import List
 
 class ImgComp(BaseModel):
     url1: str
@@ -20,23 +21,23 @@ class ImgRec(BaseModel):
 app = FastAPI()
 known_faces = []
 @app.post("/CadastroImagem")
-async def CadastroImagem(image: ImgCad):
+async def CadastroImagem(images: List[ImgCad]):
     lista = []
-
-    img = base64.b64decode(image.url)
-    imag = Image.open(io.BytesIO(img))
-    imag.convert('RGB')
-    imag.save(f"{image.name}.jpg")
-    img2 = cv2.imread(f"{image.name}.jpg")
-    rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-    img_encoding = face_recognition.face_encodings(rgb_img)[0]
-    os.remove(f"{image.name}.jpg")
-    lista.append(image.name)
-    lista.append(image.cpf)
-    lista.append(img_encoding)
-    known_faces.append(lista)
-    print(known_faces)
-    print(len(known_faces))
+    for image in images:
+        img = base64.b64decode(image.url)
+        imag = Image.open(io.BytesIO(img))
+        imag.convert('RGB')
+        imag.save(f"{image.name}.jpg")
+        img2 = cv2.imread(f"{image.name}.jpg")
+        rgb_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+        img_encoding = face_recognition.face_encodings(rgb_img)[0]
+        os.remove(f"{image.name}.jpg")
+        lista.append(image.name)
+        lista.append(image.cpf)
+        lista.append(img_encoding)
+        known_faces.append(lista)
+    # print(known_faces)
+    # print(len(known_faces))
   
 
 
