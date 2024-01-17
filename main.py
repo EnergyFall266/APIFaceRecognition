@@ -9,14 +9,14 @@ import os
 from typing import List
 
 class ImgComp(BaseModel):
-    url1: str
-    url2: str
+    img1: str
+    img2: str
 class ImgCad(BaseModel):
-    url: str
+    img: str
     name: str 
     cpf: str
 class ImgRec(BaseModel):
-    url: str
+    img: str
 
 app = FastAPI()
 known_faces = []
@@ -24,7 +24,7 @@ known_faces = []
 async def CadastroImagem(images: List[ImgCad]):
     lista = []
     for image in images:
-        img = base64.b64decode(image.url)
+        img = base64.b64decode(image.img)
         imag = Image.open(io.BytesIO(img))
         imag.convert('RGB')
         imag.save(f"{image.name}.jpg")
@@ -45,7 +45,7 @@ async def CadastroImagem(images: List[ImgCad]):
 
 @app.post("/Reconhecimento")
 async def Reconhecimento(image: ImgRec):
-    img = base64.b64decode(image.url)
+    img = base64.b64decode(image.img)
     imag = Image.open(io.BytesIO(img))
     imag.convert('RGB')
     imag.save("imagem.jpg")
@@ -69,7 +69,7 @@ async def Reconhecimento(image: ImgRec):
 
 @app.post("/ComparaImagens")
 async def ComparaImagens(image: ImgComp):
-    img = base64.b64decode(image.url1)
+    img = base64.b64decode(image.img1)
     imag = Image.open(io.BytesIO(img))
     imag.convert('RGB')
     imag.save("img1.jpg")
@@ -78,7 +78,7 @@ async def ComparaImagens(image: ImgComp):
     img_encoding = face_recognition.face_encodings(rgb_img)[0]
     os.remove("img1.jpg")
 
-    img3 = base64.b64decode(image.url2)
+    img3 = base64.b64decode(image.img2)
     imag2 = Image.open(io.BytesIO(img3))
     imag2.convert('RGB')
     imag2.save("img2.jpg")
