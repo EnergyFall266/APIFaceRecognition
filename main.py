@@ -36,8 +36,6 @@ async def CadastroImagem(images: List[ImgCad]):
         lista.append(image.cpf)
         lista.append(img_encodingCad)
         known_faces.append(lista)
-    # print(known_faces)
-    # print(len(known_faces))
   
 
 
@@ -56,20 +54,18 @@ async def Reconhecimento(image: ImgRec):
     if(len(known_faces)==0):
         return {"message": "Nao ha pessoas cadastradas"}
     i=0
-    while(i<len(known_faces)):
+    while(i<1):
         result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2Rec)
-        # print(result)
-        # print("aaaa")
         if(result[0]):
             return {"message": "Pessoa encontrada",
                     "name": known_faces[i][0],
                     "cpf": known_faces[i][1],
-                    # "distance": face_recognition.face_distance([known_faces[i][2]], img_encoding2)[0]
                     }
             
+        
         i+=1
-    # if not result[0]:
-    #     return {"message": "Pessoa nao encontrada"}
+    if not result[0]:
+        return {"message": "Pessoa nao encontrada"}
 
 @app.post("/ComparaImagens")
 async def ComparaImagens(image: ImgComp):
@@ -91,8 +87,8 @@ async def ComparaImagens(image: ImgComp):
     img_encoding2Comp = face_recognition.face_encodings(rgb_img2Comp)[0]
     os.remove("img2.jpg")
 
-    result = face_recognition.compare_faces([img_encodingComp], img_encoding2Comp)
-    if(result[0]):
+    resultComp = face_recognition.compare_faces([img_encodingComp], img_encoding2Comp)
+    if(resultComp[0]):
         return {"message": "Mesma pessoa"}
     else:
         return {"message": "Nao e a mesma pessoa"}
