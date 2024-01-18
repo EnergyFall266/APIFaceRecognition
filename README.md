@@ -12,6 +12,7 @@ pip install fastapi
 pip install uvicorn
 conda install conda-forge::pybase64
 conda install anaconda::pillow
+conda install -c conda-forge dlib
 ```
 
 ## Utilização
