@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import base64
 import cv2
@@ -19,11 +20,20 @@ class ImgRec(BaseModel):
     img: str
 
 app = FastAPI()
+origins = ["*"] 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 known_faces = []
 @app.post("/CadastroImagem")
 async def CadastroImagem(images: List[ImgCad]):
-    lista = []
     for image in images:
+        lista = []
         imgCad = base64.b64decode(image.img)
         imagCad = Image.open(io.BytesIO(imgCad))
         imagCad.convert('RGB')
@@ -51,10 +61,11 @@ async def Reconhecimento(image: ImgRec):
     rgb_img2Rec = cv2.cvtColor(img2Rec, cv2.COLOR_BGR2RGB)
     img_encoding2Rec = face_recognition.face_encodings(rgb_img2Rec)[0]
     os.remove("imagem.jpg")
+    print(known_faces)
     if(len(known_faces)==0):
         return {"message": "Nao ha pessoas cadastradas"}
     i=0
-    while(i<1):
+    while(i<len(known_faces)):
         result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2Rec)
         if(result[0]):
             return {"message": "Pessoa encontrada",
@@ -62,7 +73,7 @@ async def Reconhecimento(image: ImgRec):
                     "cpf": known_faces[i][1],
                     }
             
-        
+    
         i+=1
     if not result[0]:
         return {"message": "Pessoa nao encontrada"}
@@ -77,6 +88,8 @@ async def ComparaImagens(image: ImgComp):
     rgb_imgComp = cv2.cvtColor(img2Comp, cv2.COLOR_BGR2RGB)
     img_encodingComp = face_recognition.face_encodings(rgb_imgComp)[0]
     os.remove("img1.jpg")
+
+
 
     img3Comp = base64.b64decode(image.img2)
     imag2Comp = Image.open(io.BytesIO(img3Comp))
