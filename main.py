@@ -8,7 +8,6 @@ import io
 import face_recognition
 import os
 from typing import List
-
 class ImgComp(BaseModel):
     img1: str
     img2: str
