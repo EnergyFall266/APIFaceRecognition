@@ -5,7 +5,8 @@
 Use o [Anaconda](https://www.anaconda.com/download) para instalar o python e as bibliotecas utilizadas.
 
 ```bash
-pip install face_recognition
+
+
 pip install opencv-python
 conda install pydantic -c conda-forge
 pip install fastapi
@@ -13,6 +14,7 @@ pip install uvicorn
 conda install conda-forge::pybase64
 conda install anaconda::pillow
 conda install -c conda-forge dlib
+pip install face_recognition
 ```
 
 ## Utilização
