@@ -30,7 +30,7 @@ Armazena a imagem e as informações em uma lista para futuramente serem utiliza
 #### Entrada
 ```json
 {
-"url": "<string base64 da imagem>",
+"img": "<string base64 da imagem>",
 "name": "<string>",
 "cpf": "<string>"
 }
@@ -49,7 +49,7 @@ Compara a imagem enviada com as que ja estão salvas na lista.
 #### Entrada
 ```json
 {
-"url": "<string base64 da imagem>"
+"img": "<string base64 da imagem>"
 }
 ```
 #### Saída
@@ -73,8 +73,8 @@ Verifica se é a mesma pessoa nas 2 imagens enviadas.
 #### Entrada
 ```json
 {
-"url1": "<string base64 da imagem>",
-"url2": "<string base64 da imagem>"
+"img1": "<string base64 da imagem>",
+"img2": "<string base64 da imagem>"
 }
 ```
 #### Saída
