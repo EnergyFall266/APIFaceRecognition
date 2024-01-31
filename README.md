@@ -4,7 +4,7 @@
 
 Use o [Anaconda](https://www.anaconda.com/download) para instalar o python, a versão utilizada foi 3.12.
 
-Rode os comandos
+Depois rode os comandos:
 ```bash
 conda update --all
 ```
@@ -12,7 +12,7 @@ conda update --all
 conda install -c conda-forge dlib
 ```
 
-Após isso para instalar as bibliotecas utilizadas, rode o comando
+Após isso para instalar as bibliotecas utilizadas, rode o comando:
 ```bash
 pip install -r requirements.txt
 
