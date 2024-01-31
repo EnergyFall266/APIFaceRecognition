@@ -2,7 +2,9 @@
 
 ## Instalação
 
-Use o [Anaconda](https://www.anaconda.com/download) para instalar o python e as bibliotecas utilizadas.
+Use o [Anaconda](https://www.anaconda.com/download) para instalar o python, a versão utilizada foi 3.12.
+
+
 
 ```bash
 
