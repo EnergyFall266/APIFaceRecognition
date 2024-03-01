@@ -11,7 +11,9 @@ conda update --all
 ```bash
 conda install -c conda-forge dlib
 ```
-
+```bash
+pip install uvicorn
+```
 Após isso para instalar as bibliotecas utilizadas, rode o comando:
 ```bash
 pip install -r requirements.txt
