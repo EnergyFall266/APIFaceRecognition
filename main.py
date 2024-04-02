@@ -18,6 +18,19 @@ class ImgCad(BaseModel):
 class ImgRec(BaseModel):
     img: str
 
+
+class Info(BaseModel):
+    nomFun: str
+    fotCol: str
+    numCad: int
+    tipCol: int
+    numEmp: int
+    numCpf: int
+
+class Data(BaseModel):
+    fotPar: str
+    participantes: List[Info]
+
 app = FastAPI()
 origins = ["*"] 
 
@@ -29,6 +42,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 known_faces = []
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
 @app.post("/CadastroImagem")
 async def CadastroImagem(images: List[ImgCad]):
     for image in images:
@@ -60,7 +79,6 @@ async def Reconhecimento(image: ImgRec):
     rgb_img2Rec = cv2.cvtColor(img2Rec, cv2.COLOR_BGR2RGB)
     img_encoding2Rec = face_recognition.face_encodings(rgb_img2Rec)[0]
     os.remove("imagem.jpg")
-    print(known_faces)
     if(len(known_faces)==0):
         return {"message": "Nao ha pessoas cadastradas"}
     i=0
@@ -104,3 +122,71 @@ async def ComparaImagens(image: ImgComp):
         return {"message": "Mesma pessoa"}
     else:
         return {"message": "Nao e a mesma pessoa"}
+
+@app.post("/verifica-presenca")
+async def VerificaPresenca( data: Data):
+    try:
+        listaPessoas = []
+
+        if(len(data.participantes)==0 ):
+            return {
+                "codRet": "1",
+                "msgRet": "Nao ha pessoas cadastradas"}
+        if(data.fotPar == ""):
+            return {
+                "codRet": "1",
+                "msgRet": "Nao ha imagem para comparar"}
+        for image in data.participantes:
+            lista = []
+            imgVer = base64.b64decode(image.fotCol)
+            imagVer = Image.open(io.BytesIO(imgVer))
+            imagVer.convert('RGB')
+            imagVer.save("imagem.jpg")
+            img2Ver = cv2.imread("imagem.jpg")
+            rgb_imgVer = cv2.cvtColor(img2Ver, cv2.COLOR_BGR2RGB)
+            img_encodingVer = face_recognition.face_encodings(rgb_imgVer)[0]
+            os.remove("imagem.jpg")
+            lista.append(img_encodingVer)
+            lista.append(image.nomFun)
+            lista.append(image.numCad)
+            lista.append(image.tipCol)
+            lista.append(image.numEmp)
+            lista.append(image.numCpf)
+            listaPessoas.append(lista)
+
+        print(listaPessoas)
+        imgPres = base64.b64decode(data.fotPar)
+        imagPres = Image.open(io.BytesIO(imgPres))
+        imagPres.convert('RGB')
+        imagPres.save("imagem.jpg")
+        img2Pres = cv2.imread("imagem.jpg")
+        rgb_img2Pres = cv2.cvtColor(img2Pres, cv2.COLOR_BGR2RGB)
+        img_encoding2Pres = face_recognition.face_encodings(rgb_img2Pres)[0]
+        os.remove("imagem.jpg")
+        i=0
+        while(i<len(listaPessoas)):
+            resultVer = face_recognition.compare_faces([listaPessoas[i][0]], img_encoding2Pres)
+            if(resultVer[0]):
+                return {
+                    "codRet": 0,
+                    "msgRet": "presente",
+                    "nomFun": listaPessoas[i][1],
+                    "numCad": listaPessoas[i][2],
+                    "tipCol": listaPessoas[i][3],
+                    "numEmp": listaPessoas[i][4],
+                    "numCpf": listaPessoas[i][5]
+                        }
+                
+
+            i+=1
+        if not resultVer[0]:
+            return {
+                "codRet": 1,
+                "msgRet": "nao esta presente"
+                }
+
+    except:
+        return {
+            "codRet": 1,
+            "msgRet": "Erro ao verificar presenca"
+            }

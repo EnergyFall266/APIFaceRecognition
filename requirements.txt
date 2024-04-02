@@ -3,3 +3,5 @@ fastapi==0.109.0
 opencv_python==4.8.1.78
 Pillow==10.2.0
 pydantic==2.6.0
+uvicorn==0.25.0
+
