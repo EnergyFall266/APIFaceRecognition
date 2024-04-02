@@ -4,19 +4,20 @@
 
 Use o [Anaconda](https://www.anaconda.com/download) para instalar o python, a versão utilizada foi 3.12.
 
-
-
+Depois rode os comandos:
 ```bash
-
-
-pip install opencv-python
-conda install pydantic -c conda-forge
-pip install fastapi
-pip install uvicorn
-conda install conda-forge::pybase64
-conda install anaconda::pillow
+conda update --all
+```
+```bash
 conda install -c conda-forge dlib
-pip install face_recognition
+```
+```bash
+pip install uvicorn
+```
+Após isso para instalar as bibliotecas utilizadas, rode o comando:
+```bash
+pip install -r requirements.txt
+
 ```
 
 ## Utilização
