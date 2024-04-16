@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import base64
@@ -6,7 +6,9 @@ import cv2
 from PIL import Image
 import io
 import face_recognition
+import timeit
 import os
+import requests
 from typing import List
 class ImgComp(BaseModel):
     img1: str
@@ -28,8 +30,9 @@ class Info(BaseModel):
     numCpf: int
 
 class Data(BaseModel):
+    # platform: str
     fotPar: str
-    participantes: List[Info]
+    participantes: str
 
 app = FastAPI()
 origins = ["*"] 
@@ -45,7 +48,9 @@ known_faces = []
 
 @app.get("/")
 async def root():
+   
     return {"message": "Hello World"}
+
 
 
 @app.post("/CadastroImagem")
@@ -126,67 +131,172 @@ async def ComparaImagens(image: ImgComp):
 @app.post("/verifica-presenca")
 async def VerificaPresenca( data: Data):
     try:
-        listaPessoas = []
 
-        if(len(data.participantes)==0 ):
-            return {
-                "codRet": "1",
-                "msgRet": "Nao ha pessoas cadastradas"}
-        if(data.fotPar == ""):
-            return {
-                "codRet": "1",
-                "msgRet": "Nao ha imagem para comparar"}
-        for image in data.participantes:
-            lista = []
-            imgVer = base64.b64decode(image.fotCol)
-            imagVer = Image.open(io.BytesIO(imgVer))
-            imagVer.convert('RGB')
-            imagVer.save("imagem.jpg")
-            img2Ver = cv2.imread("imagem.jpg")
-            rgb_imgVer = cv2.cvtColor(img2Ver, cv2.COLOR_BGR2RGB)
-            img_encodingVer = face_recognition.face_encodings(rgb_imgVer)[0]
-            os.remove("imagem.jpg")
-            lista.append(img_encodingVer)
-            lista.append(image.nomFun)
-            lista.append(image.numCad)
-            lista.append(image.tipCol)
-            lista.append(image.numEmp)
-            lista.append(image.numCpf)
-            listaPessoas.append(lista)
+        # if(data.platform == "ios"):
+        #     imgPres = base64.b64decode(data.fotPar)
+        #     imagPres = Image.open(io.BytesIO(imgPres))
+        #     imagPres.convert('RGB')
+        #     teste = imagPres.rotate(-90)
+        #     teste.save("participante1.jpg")
+        #     img2Pres1 = cv2.imread("participante1.jpg")
 
-        print(listaPessoas)
+        # else:
+            # imgPres = base64.b64decode(data.fotPar)
+            # imagPres = Image.open(io.BytesIO(imgPres))
+            # imagPres.convert('RGB')
+            # imagPres.save("participante1.jpg")
+            # img2Pres1 = cv2.imread("participante1.jpg")
         imgPres = base64.b64decode(data.fotPar)
         imagPres = Image.open(io.BytesIO(imgPres))
         imagPres.convert('RGB')
-        imagPres.save("imagem.jpg")
-        img2Pres = cv2.imread("imagem.jpg")
-        rgb_img2Pres = cv2.cvtColor(img2Pres, cv2.COLOR_BGR2RGB)
-        img_encoding2Pres = face_recognition.face_encodings(rgb_img2Pres)[0]
-        os.remove("imagem.jpg")
-        i=0
-        while(i<len(listaPessoas)):
-            resultVer = face_recognition.compare_faces([listaPessoas[i][0]], img_encoding2Pres)
-            if(resultVer[0]):
-                return {
-                    "codRet": 0,
-                    "msgRet": "presente",
-                    "nomFun": listaPessoas[i][1],
-                    "numCad": listaPessoas[i][2],
-                    "tipCol": listaPessoas[i][3],
-                    "numEmp": listaPessoas[i][4],
-                    "numCpf": listaPessoas[i][5]
-                        }
-                
+        imagPres.save("participante1.jpg")
+        img2Pres1 = cv2.imread("participante1.jpg")
+        rgb_imgPres1 = cv2.cvtColor(img2Pres1, cv2.COLOR_BGR2RGB)
+        # if(len(face_recognition.face_encodings(rgb_imgPres1)) == 0):
+        #         return {
+        #             "codRet": 1,
+        #             "msgRet": "Não foi possivel identificar a pessoa na imagem"
+        #             }
+        img_encodingComp1 = face_recognition.face_encodings(rgb_imgPres1)[0]
+        os.remove("participante1.jpg")
 
-            i+=1
-        if not resultVer[0]:
-            return {
-                "codRet": 1,
-                "msgRet": "nao esta presente"
-                }
+        img3Comp2 = base64.b64decode(data.participantes)
+        imag2Comp2 = Image.open(io.BytesIO(img3Comp2))
+        imag2Comp2.convert('RGB')
+        imag2Comp2.save("participante2.jpg")
+        img4Comp2 = cv2.imread("participante2.jpg")
+        rgb_img2Comp2 = cv2.cvtColor(img4Comp2, cv2.COLOR_BGR2RGB)
+        # if(len(face_recognition.face_encodings(rgb_img2Comp2)) == 0):
+        #         return {
+        #             "codRet": 1,
+        #             "msgRet": "Não foi possivel identificar a pessoa na imagem"
+        #             }
+        img_encoding2Comp2 = face_recognition.face_encodings(rgb_img2Comp2)[0]
+        os.remove("participante2.jpg")
 
+        resultComp = face_recognition.compare_faces([img_encodingComp1], img_encoding2Comp2)
+        if(resultComp[0]):
+            return {"codRet": 0,
+                    "msgRet": "Autenticado com sucesso",}
+        else:
+            return {"codRet": 1,
+                    "msgRet": "Usuario não Autenticado"}
     except:
-        return {
-            "codRet": 1,
-            "msgRet": "Erro ao verificar presenca"
-            }
+        raise HTTPException(status_code=400, detail="Erro ao verificar presenca")
+       
+    # try:
+    #     fp = open("log.txt", "a")
+
+    #     start = timeit.default_timer()
+    #     listaPessoas = []
+
+    #     if(len(data.participantes)==0 ):
+    #         return {
+    #             "codRet": "1",
+    #             "msgRet": "Não ha pessoas cadastradas"}
+    #     if(data.fotPar == ""):
+    #         return {
+    #             "codRet": "1",
+    #             "msgRet": "Não ha imagem para comparar"}
+    #     for image in data.participantes:
+    #         lista = []
+    #         imgVer = base64.b64decode(image.fotCol)
+    #         imagVer = Image.open(io.BytesIO(imgVer))
+    #         imagVer.convert('RGB')
+    #         imagVer.save("imagem.jpg")
+    #         img2Ver = cv2.imread("imagem.jpg")
+    #         rgb_imgVer = cv2.cvtColor(img2Ver, cv2.COLOR_BGR2RGB)
+    #         if(len(face_recognition.face_encodings(rgb_imgVer)) == 0):
+    #             return {
+    #                 "codRet": 1,
+    #                 "msgRet": "Não foi possivel identificar a pessoa na imagem"
+    #                 }
+    #         img_encodingVer = face_recognition.face_encodings(rgb_imgVer)[0]
+    #         os.remove("imagem.jpg")
+    #         lista.append(img_encodingVer)
+    #         lista.append(image.nomFun)
+    #         lista.append(image.numCad)
+    #         lista.append(image.tipCol)
+    #         lista.append(image.numEmp)
+    #         lista.append(image.numCpf)
+    #         listaPessoas.append(lista)
+
+    #         stop = timeit.default_timer()
+    #         fp.write(f"cadastro: {stop - start}\n")
+
+    #         print('conversao: ', stop - start) 
+ 
+    #     # print(listaPessoas)
+    #     # print(data.fotPar)
+    #     if(data.platform == "ios"):
+    #         imgPres = base64.b64decode(data.fotPar)
+    #         imagPres = Image.open(io.BytesIO(imgPres))
+    #         imagPres.convert('RGB')
+    #         teste = imagPres.rotate(-90)
+    #         teste.save("imagem2.jpg")
+    #         img2Pres = cv2.imread("imagem2.jpg")
+
+    #     elif(data.platform == "android"):
+    #         imgPres = base64.b64decode(data.fotPar)
+    #         imagPres = Image.open(io.BytesIO(imgPres))
+    #         imagPres.convert('RGB')
+    #         # teste = imagPres.rotate(-90)
+    #         imagPres.save("imagem2.jpg")
+    #         img2Pres = cv2.imread("imagem2.jpg")
+
+    #     else:
+    #         return {
+    #             "codRet": 1,
+    #             "msgRet": "Plataforma não suportada"
+    #             }
+
+
+
+    #     rgb_img2Pres = cv2.cvtColor(img2Pres, cv2.COLOR_BGR2RGB)
+    #     if(len(face_recognition.face_encodings(rgb_img2Pres)) == 0):
+    #         return {
+    #             "codRet": 1,
+    #             "msgRet": "Não foi possivel identificar a pessoa na imagem"
+    #             }
+    #     img_encoding2Pres = face_recognition.face_encodings(rgb_img2Pres)[0]
+    #     os.remove("imagem2.jpg")
+
+
+    #     start1 = timeit.default_timer()
+    #     i=0
+    #     while(i<len(listaPessoas)):
+    #         resultVer = face_recognition.compare_faces([listaPessoas[i][0]], img_encoding2Pres)
+    #         if(resultVer[0]):
+    #             stop1 = timeit.default_timer()
+    #             fp.write(f"comparacao: {stop1 - start1}\n")
+    #             return {"participante":{
+    #                 "codRet": 0,
+    #                 "msgRet": "Autenticado com sucesso",
+    #                 "nomFun": listaPessoas[i][1],
+    #                 "numCad": listaPessoas[i][2],
+    #                 "tipCol": listaPessoas[i][3],
+    #                 "numEmp": listaPessoas[i][4],
+    #                 "numCpf": listaPessoas[i][5],
+    #                 "tempo": stop1 - start1,
+
+    #             }
+    #                     }
+
+    #         i+=1
+
+    #     stop1 = timeit.default_timer()
+    #     fp.write(f"comparacao: {stop1 - start1}\n")
+
+    #     print('comparacao: ', stop - start) 
+    #     fp.close()
+    #     if not resultVer[0]:
+    #         return {
+    #             "codRet": 1,
+    #             "msgRet": "Pessoa não encontrada"
+    #             }
+
+    # except:
+    #     return {
+    #         "codRet": 1,
+    #         "msgRet": "Erro ao verificar presenca"
+    #         }
