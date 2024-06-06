@@ -156,13 +156,13 @@ async def VerificaPresenca( data: Data):
         end_time = time.time()
         elapsed_time = end_time - start_time
         if(resultComp[0]):
-            return {"codRet": 0,
+            return {"detail":{"codRet": 0,
                     "msgRet": "Autenticado com sucesso",
-                    "tempo": elapsed_time}
+                    "tempo": elapsed_time}}
         else:
-            return {"codRet": 1,
+            return {"detail":{"codRet": 1,
                     "msgRet": "Usuario não Autenticado",
-                    "tempo": elapsed_time}
+                    "tempo": elapsed_time}}
     except:
         raise HTTPException(status_code=400, detail={"codRet":1, "msgRet":"Erro ao verificar presenca"})
        
