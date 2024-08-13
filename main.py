@@ -9,6 +9,7 @@ import face_recognition
 import os
 import time
 from typing import List
+
 class ImgComp(BaseModel):
     img1: str
     img2: str
@@ -47,57 +48,59 @@ known_faces = []
 
 @app.get("/")
 async def root():
-   
+
     return {"message": "Hello World"}
 
+   
 
 
-@app.post("/CadastroImagem")
-async def CadastroImagem(images: List[ImgCad]):
-    for image in images:
-        lista = []
-        imgCad = base64.b64decode(image.img)
-        imagCad = Image.open(io.BytesIO(imgCad))
-        imagCad.convert('RGB')
-        imagCad.save(f"{image.name}.jpg")
-        img2Cad = cv2.imread(f"{image.name}.jpg")
-        rgb_imgCad = cv2.cvtColor(img2Cad, cv2.COLOR_BGR2RGB)
-        img_encodingCad = face_recognition.face_encodings(rgb_imgCad)[0]
-        os.remove(f"{image.name}.jpg")
-        lista.append(image.name)
-        lista.append(image.cpf)
-        lista.append(img_encodingCad)
-        known_faces.append(lista)
+
+# @app.post("/CadastroImagem")
+# async def CadastroImagem(images: List[ImgCad]):
+#     for image in images:
+#         lista = []
+#         imgCad = base64.b64decode(image.img)
+#         imagCad = Image.open(io.BytesIO(imgCad))
+#         imagCad.convert('RGB')
+#         imagCad.save(f"{image.name}.jpg")
+#         img2Cad = cv2.imread(f"{image.name}.jpg")
+#         rgb_imgCad = cv2.cvtColor(img2Cad, cv2.COLOR_BGR2RGB)
+#         img_encodingCad = face_recognition.face_encodings(rgb_imgCad)[0]
+#         os.remove(f"{image.name}.jpg")
+#         lista.append(image.name)
+#         lista.append(image.cpf)
+#         lista.append(img_encodingCad)
+#         known_faces.append(lista)
   
 
 
-    return {"message": "Imagem cadastrada com sucesso"}
+#     return {"message": "Imagem cadastrada com sucesso"}
 
-@app.post("/Reconhecimento")
-async def Reconhecimento(image: ImgRec):
-    imgRec = base64.b64decode(image.img)
-    imagRec = Image.open(io.BytesIO(imgRec))
-    imagRec.convert('RGB')
-    imagRec.save("imagem.jpg")
-    img2Rec = cv2.imread("imagem.jpg")
-    rgb_img2Rec = cv2.cvtColor(img2Rec, cv2.COLOR_BGR2RGB)
-    img_encoding2Rec = face_recognition.face_encodings(rgb_img2Rec)[0]
-    os.remove("imagem.jpg")
-    if(len(known_faces)==0):
-        return {"message": "Nao ha pessoas cadastradas"}
-    i=0
-    while(i<len(known_faces)):
-        result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2Rec)
-        if(result[0]):
-            return {"message": "Pessoa encontrada",
-                    "name": known_faces[i][0],
-                    "cpf": known_faces[i][1],
-                    }
+# @app.post("/Reconhecimento")
+# async def Reconhecimento(image: ImgRec):
+#     imgRec = base64.b64decode(image.img)
+#     imagRec = Image.open(io.BytesIO(imgRec))
+#     imagRec.convert('RGB')
+#     imagRec.save("imagem.jpg")
+#     img2Rec = cv2.imread("imagem.jpg")
+#     rgb_img2Rec = cv2.cvtColor(img2Rec, cv2.COLOR_BGR2RGB)
+#     img_encoding2Rec = face_recognition.face_encodings(rgb_img2Rec)[0]
+#     os.remove("imagem.jpg")
+#     if(len(known_faces)==0):
+#         return {"message": "Nao ha pessoas cadastradas"}
+#     i=0
+#     while(i<len(known_faces)):
+#         result = face_recognition.compare_faces([known_faces[i][2]], img_encoding2Rec)
+#         if(result[0]):
+#             return {"message": "Pessoa encontrada",
+#                     "name": known_faces[i][0],
+#                     "cpf": known_faces[i][1],
+#                     }
             
     
-        i+=1
-    if not result[0]:
-        return {"message": "Pessoa nao encontrada"}
+#         i+=1
+#     if not result[0]:
+#         return {"message": "Pessoa nao encontrada"}
 
 @app.post("/ComparaImagens")
 async def ComparaImagens(image: ImgComp):
@@ -109,7 +112,6 @@ async def ComparaImagens(image: ImgComp):
     rgb_imgComp = cv2.cvtColor(img2Comp, cv2.COLOR_BGR2RGB)
     img_encodingComp = face_recognition.face_encodings(rgb_imgComp)[0]
     os.remove("img1.jpg")
-
 
 
     img3Comp = base64.b64decode(image.img2)

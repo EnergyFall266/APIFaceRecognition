@@ -6,6 +6,9 @@ COPY . ./
 
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 RUN pip install dlib==19.24.2
+RUN pip uninstall numpy
+
+RUN pip install numpy==1.26.4
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
