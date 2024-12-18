@@ -51,10 +51,6 @@ async def root():
 
     return {"message": "Hello World"}
 
-   
-
-
-
 # @app.post("/CadastroImagem")
 # async def CadastroImagem(images: List[ImgCad]):
 #     for image in images:
@@ -72,8 +68,6 @@ async def root():
 #         lista.append(img_encodingCad)
 #         known_faces.append(lista)
   
-
-
 #     return {"message": "Imagem cadastrada com sucesso"}
 
 # @app.post("/Reconhecimento")
